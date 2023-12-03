@@ -28,9 +28,9 @@ async def ModelLifespan(app: FastAPI):
 app = FastAPI(lifespan=ModelLifespan)
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World", 'test': chatModel}
+# @app.get("/")
+# def read_root():
+#     return {"Hello": "World", 'test': chatModel}
 
 
 @app.post("/begin_conversation")
@@ -46,19 +46,6 @@ async def begin_conversation(prompt: Annotated[str, Form()],
     }
 
 
-@app.post("/converse_with_image")
-async def converse_with_image(prompt: Annotated[str, Form()], 
-                        image: Annotated[UploadFile, File()],
-                        ):
-    content = await image.read()
-    content = Image.open(BytesIO(content)).convert('RGB')
-    print(content)
-    return {
-        "prompt": prompt,
-        "imageb_content_type": "image",
-    }
-
-
 @app.post("/converse")
 async def converse(prompt: Annotated[str, Form()],):
     response = chatModel.continue_chat(prompt)
@@ -70,8 +57,9 @@ async def converse(prompt: Annotated[str, Form()],):
 
 @app.get("/get_convo_history")
 async def converse():
+    history = chatModel.conversation_history()
     return {
-        "history": "cute",
+        "history": history,
     }
 
 
