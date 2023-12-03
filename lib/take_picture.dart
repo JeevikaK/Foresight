@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
@@ -19,6 +21,9 @@ class TakePictureScreen extends StatefulWidget {
 class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
+  String prompt = "please describe this image";
+  String convo_prompt = "tell me more about the object present in the image";
+  var response = '';
 
   @override
   void initState() {
@@ -56,6 +61,18 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           ),
         ),
         Positioned(
+          top: 280,
+          left: 8,
+          right: 8,
+          child: Text(
+            response,
+            style: TextStyle(
+                fontSize: 17.5,
+                fontWeight: FontWeight.normal,
+                color: Colors.white),
+          ),
+        ),
+        Positioned(
           bottom: 40,
           left: 15,
           right: 15,
@@ -74,8 +91,9 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                           if (!mounted) return;
 
                           print(image.path);
-                          Get.to(() =>
-                              DisplayPictureScreen(imagePath: image.path));
+                          // Get.to(() =>
+                          //     DisplayPictureScreen(imagePath: image.path));
+                          begin_conversation(image.path, prompt);
                         } catch (e) {
                           print(e);
                         }
@@ -86,14 +104,18 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                             fontWeight: FontWeight.w500, fontSize: 19.0),
                       )),
                   ElevatedButton(
-                      onPressed: () async {},
+                      onPressed: () async {
+                        continueConversation(convo_prompt);
+                      },
                       child: Text(
-                        'Clear',
+                        'Converse',
                         style: GoogleFonts.lato(
                             fontWeight: FontWeight.w500, fontSize: 19.0),
                       )),
                   ElevatedButton(
-                      onPressed: () async {},
+                      onPressed: () async {
+                        getConversationHistory();
+                      },
                       child: Text(
                         'Read Aloud',
                         style: GoogleFonts.lato(
@@ -123,6 +145,49 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         )
       ]),
     );
+  }
+
+  begin_conversation(String filePath, String prompt) async {
+    // final response = await http.get(Uri.parse('https://server.loca.lt/begin_conversation'));
+    File file = File(filePath);
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse("https://server.loca.lt/begin_conversation"),
+    );
+    Map<String, String> headers = {"Content-type": "multipart/form-data"};
+    request.files.add(http.MultipartFile.fromBytes(
+        'image', file.readAsBytesSync(),
+        filename: filePath.split("/").last));
+    request.headers.addAll(headers);
+    request.fields.addAll({"prompt": prompt});
+    var request_send = await request.send();
+    final post_response = await http.Response.fromStream(request_send);
+    final json_response = json.decode(post_response.body);
+    setState(() {
+      response = json_response['response'];
+    });
+    // print("This is response:" + post_response.body);
+  }
+
+  continueConversation(String prompt) async {
+    final post_response = await http.post(
+        Uri.parse('https://server.loca.lt/converse'),
+        body: {"prompt": prompt});
+
+    final json_response = json.decode(post_response.body);
+
+    setState(() {
+      response = json_response['response'];
+    });
+    // print("This is response:" + post_response.body);
+  }
+
+  getConversationHistory() async {
+    final response = await http.get(
+      Uri.parse('https://server.loca.lt/get_convo_history'),
+    );
+
+    print("This is response:" + response.body);
   }
 }
 
