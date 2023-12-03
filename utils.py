@@ -13,30 +13,30 @@ from bs4 import BeautifulSoup
 
 from transformers import AutoProcessor, BlipForConditionalGeneration
 
-class LlavaChat:
-    def __init__(self,load_in_4bit=True,
-                    bnb_4bit_compute_dtype=torch.float16,
-                    bnb_4bit_use_double_quant=True,
-                    bnb_4bit_quant_type='nf4',
-                    device_map = 'auto'):
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.processor = AutoProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
-        self.model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
+# class LlavaChat:
+#     def __init__(self,load_in_4bit=True,
+#                     bnb_4bit_compute_dtype=torch.float16,
+#                     bnb_4bit_use_double_quant=True,
+#                     bnb_4bit_quant_type='nf4',
+#                     device_map = 'auto'):
+#         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#         self.processor = AutoProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
+#         self.model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
 
-    def start_new_chat(self,
-                       image,
-                       prompt: str,) -> str:
-        inputs = self.processor(images=image, text=prompt, return_tensors="pt")
-        output = self.model.generate(**inputs)
-        return self.processor.decode(output[0], skip_special_tokens=True)
+#     def start_new_chat(self,
+#                        image,
+#                        prompt: str,) -> str:
+#         inputs = self.processor(images=image, text=prompt, return_tensors="pt")
+#         output = self.model.generate(**inputs)
+#         return self.processor.decode(output[0], skip_special_tokens=True)
 
-    def continue_chat(self, prompt: str) -> str:
-        return prompt
+#     def continue_chat(self, prompt: str) -> str:
+#         return prompt
     
-    def conversation_history(self):
-        conversation = {0: {'user': 'Describe the image',
-  'bot': 'In the image, a man is standing on the back of a yellow taxi, which is in motion on a city street. '}}
-        return conversation
+#     def conversation_history(self):
+#         conversation = {0: {'user': 'Describe the image',
+#   'bot': 'In the image, a man is standing on the back of a yellow taxi, which is in motion on a city street. '}}
+#         return conversation
 
     
 
@@ -75,7 +75,7 @@ class LLavaChat:
                                                            low_cpu_mem_usage=True,
                                                            device_map=device_map,
                                                            load_in_8bit=load_in_8_bit,
-                                                           load_in_4_bit=load_in_4_bit,
+                                                        #    load_in_4_bit=load_in_4_bit,
                                                            quantization_config=quant_cfg
                                                            )
         self.tokenizer = AutoTokenizer.from_pretrained(model_path,
@@ -175,12 +175,14 @@ class LLavaChat:
         return ' '.join(soup.stripped_strings)
 
     def conversation_history(self):
-        history = self.conv.messages
-        history_len = len(history)
-        conversation = {}
-        for i in range(0, history_len, 2):
-            conversation[i//2] = {}
-            conversation[i//2]['user'] = self.remove_tags(history[i][1])
-            conversation[i//2]['bot'] = self.remove_tags(history[i+1][1])
-
-        return conversation
+        try:
+            history = self.conv.messages
+            history_len = len(history)
+            conversation = {}
+            for i in range(0, history_len, 2):
+                conversation[i//2] = {}
+                conversation[i//2]['user'] = self.remove_tags(history[i][1])
+                conversation[i//2]['bot'] = self.remove_tags(history[i+1][1])
+            return conversation
+        except AttributeError:
+            return None
