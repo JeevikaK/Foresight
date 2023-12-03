@@ -31,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.blueAccent,
         centerTitle: true,
@@ -42,7 +43,11 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Spacer(
-              flex: 5,
+              flex: 1,
+            ),
+            Image.asset('android/assets/images/launcher_icon.png'),
+            const Spacer(
+              flex: 2,
             ),
             SizedBox(
               width: 280,
