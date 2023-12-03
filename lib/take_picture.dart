@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:get/get.dart';
@@ -42,49 +41,87 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Take a picture')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            FutureBuilder<void>(
-              future: _initializeControllerFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return CameraPreview(_controller);
-                } else {
-                  return const Center(child: CircularProgressIndicator());
-                }
-              },
-            ),
-            const Spacer(flex: 1),
-            SizedBox(
-              child: ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      await _initializeControllerFuture;
-                      final image = await _controller.takePicture();
-
-                      if (!mounted) return;
-
-                      print(image.path);
-                      Get.to(() => DisplayPictureScreen(imagePath: image.path));
-                    } catch (e) {
-                      print(e);
-                    }
-                  },
-                  child: Text(
-                    'Take Picture',
-                    style: GoogleFonts.lato(
-                        fontWeight: FontWeight.w500, fontSize: 19.0),
-                  )),
-            ),
-            const Spacer(
-              flex: 1,
-            ),
-          ],
+      body: Stack(children: <Widget>[
+        SizedBox(
+          height: double.infinity,
+          child: FutureBuilder<void>(
+            future: _initializeControllerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return CameraPreview(_controller);
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
         ),
-      ),
+        Positioned(
+          bottom: 40,
+          left: 15,
+          right: 15,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                      onPressed: () async {
+                        try {
+                          await _initializeControllerFuture;
+                          final image = await _controller.takePicture();
+
+                          if (!mounted) return;
+
+                          print(image.path);
+                          Get.to(() =>
+                              DisplayPictureScreen(imagePath: image.path));
+                        } catch (e) {
+                          print(e);
+                        }
+                      },
+                      child: Text(
+                        'Describe',
+                        style: GoogleFonts.lato(
+                            fontWeight: FontWeight.w500, fontSize: 19.0),
+                      )),
+                  ElevatedButton(
+                      onPressed: () async {},
+                      child: Text(
+                        'Clear',
+                        style: GoogleFonts.lato(
+                            fontWeight: FontWeight.w500, fontSize: 19.0),
+                      )),
+                  ElevatedButton(
+                      onPressed: () async {},
+                      child: Text(
+                        'Read Aloud',
+                        style: GoogleFonts.lato(
+                            fontWeight: FontWeight.w500, fontSize: 19.0),
+                      )),
+                ],
+              ),
+              const SizedBox(
+                height: 6,
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Get.back();
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(15),
+                  shape: const CircleBorder(),
+                  backgroundColor: Colors.red,
+                ),
+                child: const Icon(
+                  Icons.stop,
+                  size: 35,
+                ),
+              )
+            ],
+          ),
+        )
+      ]),
     );
   }
 }
