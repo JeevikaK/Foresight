@@ -24,6 +24,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   String prompt = "please describe this image";
   String convo_prompt = "tell me more about the object present in the image";
   var response = '';
+  late bool reload;
 
   @override
   void initState() {
@@ -32,6 +33,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       widget.camera,
       ResolutionPreset.max,
     );
+    reload = true;
 
     _initializeControllerFuture = _controller.initialize();
   }
@@ -60,18 +62,35 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             },
           ),
         ),
-        Positioned(
-          top: 280,
-          left: 8,
-          right: 8,
-          child: Text(
-            response,
-            style: TextStyle(
-                fontSize: 17.5,
-                fontWeight: FontWeight.normal,
-                color: Colors.white),
-          ),
-        ),
+        reload
+            ? Positioned(
+                top: 420,
+                left: 12,
+                right: 12,
+                bottom: 175,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    children: [
+                      Text(
+                        response,
+                        style: TextStyle(
+                            fontSize: 17.5,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : Positioned(
+                top: 350,
+                left: 0,
+                right: 0,
+                child: Center(
+                    child: CircularProgressIndicator(
+                  color: Colors.white,
+                ))),
         Positioned(
           bottom: 40,
           left: 15,
@@ -93,6 +112,9 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                           print(image.path);
                           // Get.to(() =>
                           //     DisplayPictureScreen(imagePath: image.path));
+                          setState(() {
+                            reload = false;
+                          });
                           begin_conversation(image.path, prompt);
                         } catch (e) {
                           print(e);
@@ -105,6 +127,9 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                       )),
                   ElevatedButton(
                       onPressed: () async {
+                        setState(() {
+                          reload = false;
+                        });
                         continueConversation(convo_prompt);
                       },
                       child: Text(
@@ -165,6 +190,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     final json_response = json.decode(post_response.body);
     setState(() {
       response = json_response['response'];
+      reload = true;
     });
     // print("This is response:" + post_response.body);
   }
@@ -178,6 +204,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
     setState(() {
       response = json_response['response'];
+      reload = true;
     });
     // print("This is response:" + post_response.body);
   }
