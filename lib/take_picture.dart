@@ -2,9 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:llava_flutter/llava_chat.dart';
+import 'package:llava_flutter/models.dart';
 
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
@@ -25,6 +28,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   String convo_prompt = "tell me more about the object present in the image";
   var response = '';
   late bool reload;
+  String imagePath = 'default';
 
   @override
   void initState() {
@@ -106,6 +110,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                         try {
                           await _initializeControllerFuture;
                           final image = await _controller.takePicture();
+                          imagePath = image.path;
 
                           if (!mounted) return;
 
@@ -127,10 +132,22 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                       )),
                   ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          reload = false;
-                        });
-                        continueConversation(convo_prompt);
+                        // setState(() {
+                        //   reload = false;
+                        // });
+                        // continueConversation(convo_prompt);
+                        // showModalBottomSheet(
+                        //     context: context,
+                        //     builder: (BuildContext context) {
+                        //       return ContinueConversation();
+                        //     });
+                        imagePath != 'default'
+                            ? Get.to(() => IndividualChats(
+                                  imagePath: imagePath,
+                                ))
+                            : Fluttertoast.showToast(
+                                textColor: Colors.white,
+                                msg: 'Image not captured yet');
                       },
                       child: Text(
                         'Converse',
@@ -215,6 +232,25 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     );
 
     print("This is response:" + response.body);
+  }
+}
+
+class ContinueConversation extends StatelessWidget {
+  const ContinueConversation({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const <Widget>[
+          Text('GeeksforGeeks'),
+        ],
+      )),
+    );
   }
 }
 
