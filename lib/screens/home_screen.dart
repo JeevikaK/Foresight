@@ -2,7 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:llava_flutter/take_picture.dart';
+import 'package:llava_flutter/screens/take_picture.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

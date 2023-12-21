@@ -11,8 +11,7 @@ class ChatMessageCard extends StatelessWidget {
         alignment: Alignment.centerRight,
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width - 80,
-          ),
+              maxWidth: MediaQuery.of(context).size.width - 80, minWidth: 105),
           child: Card(
             elevation: 1,
             shape:
@@ -22,7 +21,7 @@ class ChatMessageCard extends StatelessWidget {
             child: Stack(children: [
               Padding(
                 padding: const EdgeInsets.only(
-                    left: 8, right: 30, top: 5, bottom: 20),
+                    left: 8, right: 8, top: 5, bottom: 20),
                 child: Text(
                   msg,
                   style: TextStyle(
@@ -31,8 +30,8 @@ class ChatMessageCard extends StatelessWidget {
                 ),
               ),
               Positioned(
-                bottom: 4,
-                right: 10,
+                bottom: 0,
+                right: 6,
                 child: Row(
                   children: [
                     Text(time,

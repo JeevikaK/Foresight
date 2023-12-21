@@ -6,8 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:llava_flutter/llava_chat.dart';
-import 'package:llava_flutter/models.dart';
+import 'package:llava_flutter/screens/llava_chat.dart';
 
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
@@ -190,11 +189,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   }
 
   begin_conversation(String filePath, String prompt) async {
-    // final response = await http.get(Uri.parse('https://server.loca.lt/begin_conversation'));
+    // final response = await http.get(Uri.parse('https://server-llava.loca.lt/begin_conversation'));
     File file = File(filePath);
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse("https://server.loca.lt/begin_conversation"),
+      Uri.parse("https://server-llava.loca.lt/begin_conversation"),
     );
     Map<String, String> headers = {"Content-type": "multipart/form-data"};
     request.files.add(http.MultipartFile.fromBytes(
@@ -214,7 +213,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   continueConversation(String prompt) async {
     final post_response = await http.post(
-        Uri.parse('https://server.loca.lt/converse'),
+        Uri.parse('https://server-llava.loca.lt/converse'),
         body: {"prompt": prompt});
 
     final json_response = json.decode(post_response.body);
@@ -228,7 +227,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   getConversationHistory() async {
     final response = await http.get(
-      Uri.parse('https://server.loca.lt/get_convo_history'),
+      Uri.parse('https://server-llava.loca.lt/get_convo_history'),
     );
 
     print("This is response:" + response.body);

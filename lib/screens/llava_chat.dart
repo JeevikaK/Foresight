@@ -2,10 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'chat_message_card.dart';
-import 'reply_message_card.dart';
-import 'models.dart';
+import 'package:record/record.dart';
+import '../models/chat_message_card.dart';
+import '../models/reply_message_card.dart';
+import '../models/models.dart';
 import 'package:http/http.dart' as http;
+import 'package:dart_openai/dart_openai.dart';
+import '../env/env.dart';
 
 class IndividualChats extends StatefulWidget {
   const IndividualChats({super.key, required this.imagePath});
@@ -24,6 +27,7 @@ class _IndividualChatsState extends State<IndividualChats> {
   List<MessageModel> messages = [];
   late Image image;
   late var response;
+  final record = AudioRecorder();
 
   @override
   void initState() {
@@ -36,6 +40,16 @@ class _IndividualChatsState extends State<IndividualChats> {
       }
     });
     image = Image.file(File(widget.imagePath));
+    OpenAI.apiKey = Env.apiKey;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    record.dispose();
+    focusNode.dispose();
+    _scrollController.dispose();
+    _textController.dispose();
   }
 
   Future<void> sendChatMsg(String prompt) async {
@@ -48,7 +62,7 @@ class _IndividualChatsState extends State<IndividualChats> {
     });
 
     final post_response = await http.post(
-        Uri.parse('https://server.loca.lt/converse'),
+        Uri.parse('https://server-llava.loca.lt/converse'),
         body: {"prompt": prompt});
     final json_response = json.decode(post_response.body);
     response = json_response['response'];
@@ -163,12 +177,13 @@ class _IndividualChatsState extends State<IndividualChats> {
                       Row(
                         children: [
                           Container(
-                              width: MediaQuery.of(context).size.width - 55,
+                              height: 65,
+                              width: MediaQuery.of(context).size.width - 65,
                               child: Card(
                                   margin: const EdgeInsets.only(
-                                      left: 2, right: 2, bottom: 8),
+                                      left: 2, right: 4, bottom: 8),
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(25)),
+                                      borderRadius: BorderRadius.circular(35)),
                                   child: TextFormField(
                                     controller: _textController,
                                     focusNode: focusNode,
@@ -191,6 +206,7 @@ class _IndividualChatsState extends State<IndividualChats> {
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       hintText: "Type your message",
+                                      hintStyle: TextStyle(fontSize: 18),
                                       contentPadding: const EdgeInsets.all(5),
                                     ),
                                   ))),
@@ -198,10 +214,10 @@ class _IndividualChatsState extends State<IndividualChats> {
                             padding:
                                 const EdgeInsets.only(bottom: 8.0, right: 2),
                             child: CircleAvatar(
-                              radius: 25,
+                              radius: 30,
                               backgroundColor: Colors.purple.shade400,
-                              child: IconButton(
-                                  onPressed: () {
+                              child: GestureDetector(
+                                  onTap: () {
                                     if (sendChatButton) {
                                       _scrollController.animateTo(
                                           _scrollController
@@ -216,8 +232,23 @@ class _IndividualChatsState extends State<IndividualChats> {
                                       });
                                     }
                                   },
-                                  icon: Icon(
+                                  onLongPress: () async {
+                                    if (await record.hasPermission() &&
+                                        !sendChatButton) {
+                                      await record.start(
+                                          const RecordConfig(
+                                              noiseSuppress: true,
+                                              encoder: AudioEncoder.aacHe),
+                                          path: '/sdcard/Download/temp.m4a');
+                                    }
+                                  },
+                                  onLongPressUp: () async {
+                                    final path = await record.stop();
+                                    inputSpeechTranslation(path);
+                                  },
+                                  child: Icon(
                                     sendChatButton ? Icons.send : Icons.mic,
+                                    size: 32,
                                     color: Colors.white,
                                   )),
                             ),
@@ -244,5 +275,16 @@ class _IndividualChatsState extends State<IndividualChats> {
         ),
       ),
     );
+  }
+
+  Future<void> inputSpeechTranslation(String? path) async {
+    final transcription = await OpenAI.instance.audio.createTranscription(
+      file: File(path!),
+      model: "whisper-1",
+      responseFormat: OpenAIAudioResponseFormat.json,
+    );
+    File(path).delete;
+    print(transcription.text);
+    await sendChatMsg(transcription.text);
   }
 }
