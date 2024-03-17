@@ -24,7 +24,7 @@ async def ModelLifespan(app: FastAPI):
     print("Whisper Loaded...")
     detectronModel = Load_detectron_weights("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
     print("Detectron Model Loaded")
-    geminiModel = GeminiChat()
+    geminiModel = LLM()
     print("Gemini Loaded")
     yield
     chatModel = None

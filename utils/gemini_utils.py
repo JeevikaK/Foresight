@@ -5,7 +5,7 @@ load_dotenv()
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
-class GeminiChat:
+class LLM:
     def __init__(self, model = 'gemini-pro', history = []):
         self.model = genai.GenerativeModel(model)
         self.history = history
