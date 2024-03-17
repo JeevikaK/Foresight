@@ -153,3 +153,21 @@ class LLavaChat:
             return conversation
         except AttributeError:
             return None
+        
+    def LMM_preprocessing(self, img_path, metadata_detectron):
+        prompt = f'''
+        You are a visual AI Assistant, Please give me the complete detailed description of the image.
+
+        refer to the following json also, which contains most of the objects in the scene along with the number of objects -
+        {metadata_detectron}
+        '''
+        return self.start_new_chat(img_path=img_path, prompt=prompt)
+    
+    def process_query(self, query, metadata_detectron):
+        prompt = f'''
+        The image has the following objects and scenic information and not more or less: {metadata_detectron}
+
+        Answer the below query and refer to scenic information if required
+        Query: {query}
+        '''
+        return self.continue_chat(prompt = prompt)

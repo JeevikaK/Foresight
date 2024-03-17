@@ -1,32 +1,39 @@
-from main import chatModel, whisperModel
+from main import llavaModel, whisperModel, geminiModel, detectronModel
+from utils.coreChat import Chat
 from PIL import Image
 from io import BytesIO
 import tempfile
 import os
 
+chat = Chat(geminiModel=geminiModel,
+            llavaModel=llavaModel,
+            detectronModel=detectronModel) 
+
 async def begin_conversation(prompt, image):
     content = await image.read()
     image = Image.open(BytesIO(content)).convert('RGB')
-    response = chatModel.start_new_chat(image, prompt)
+    chat.prepareMetadata(image)
+    response = chat.start_chat(prompt)
     return {
         "prompt": prompt,
-        "response" : response
+        "response" : response,
+        # "image": image
     }
 
-async def continue_chat(prompt):
-    response = chatModel.continue_chat(prompt)
+def continue_chat(prompt):
+    response = chat.continue_chat(prompt)
     return {
         "prompt": prompt,
         "response": response
     }
 
-async def get_history():
-    history = chatModel.conversation_history()
+def get_history():
+    history = chat.get_history()
     return {
         "history": history,
     }
 
-async def transcribe(file):
+def transcribe(file):
     temp_file = tempfile.NamedTemporaryFile(delete=False)
     temp_file.write(file.file.read())
     trasncription = whisperModel.transcribe(temp_file.name)
