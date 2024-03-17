@@ -40,7 +40,6 @@ async def begin_conversation(prompt: Annotated[str, Form()],
     content = await image.read()
     image = Image.open(BytesIO(content)).convert('RGB')
     response = chatModel.start_new_chat(image, prompt)
-    #owais sucks too hard
     return {
         "prompt": prompt,
         "response" : response
