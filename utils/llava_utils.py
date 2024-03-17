@@ -5,40 +5,7 @@ from llava.constants import IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN, DEFAULT_IM_S
 from llava.mm_utils import tokenizer_image_token, KeywordsStoppingCriteria
 from llava.conversation import conv_templates, SeparatorStyle
 import torch
-from PIL import Image
-import requests
-from io import BytesIO
 from bs4 import BeautifulSoup
-
-
-from transformers import AutoProcessor, BlipForConditionalGeneration
-
-# class LlavaChat:
-#     def __init__(self,load_in_4bit=True,
-#                     bnb_4bit_compute_dtype=torch.float16,
-#                     bnb_4bit_use_double_quant=True,
-#                     bnb_4bit_quant_type='nf4',
-#                     device_map = 'auto'):
-#         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-#         self.processor = AutoProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
-#         self.model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
-
-#     def start_new_chat(self,
-#                        image,
-#                        prompt: str,) -> str:
-#         inputs = self.processor(images=image, text=prompt, return_tensors="pt")
-#         output = self.model.generate(**inputs)
-#         return self.processor.decode(output[0], skip_special_tokens=True)
-
-#     def continue_chat(self, prompt: str) -> str:
-#         return prompt
-    
-#     def conversation_history(self):
-#         conversation = {0: {'user': 'Describe the image',
-#   'bot': 'In the image, a man is standing on the back of a yellow taxi, which is in motion on a city street. '}}
-#         return conversation
-
-    
 
 
 class LLavaChat:
