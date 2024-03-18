@@ -21,3 +21,6 @@ git+https://github.com/Shades-en/detectron2.git
 openai-whisper
 python-dotenv
 google-generativeai
+"uvicorn[standard]"
+fastapi
+opencv-python

@@ -60,3 +60,9 @@ class Detectron:
                 metadata = self.metadata_detectron[i]
                 metadata['count'] = metadata.get('count') + 1
         return self.metadata_detectron
+    
+    def segment_image(self, image):
+        v = Visualizer(image, MetadataCatalog.get(self.cfg.DATASETS.TRAIN[0]), scale=1.0, instance_mode=ColorMode.SEGMENTATION)
+        outputs = self.predictor(image)
+        out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+        return out.get_image()

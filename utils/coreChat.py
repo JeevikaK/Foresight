@@ -12,10 +12,12 @@ class Chat:
         self.metadata_lmm = ''
         self.translator = str.maketrans('', '', string.punctuation)
         self.history = []
+        self.segmented_image = None
 
     def prepareMetadata(self, img):
         self.detectron.initialise()
         self.metadata_detectron = self.detectron.create_metadata(img)
+        self.segmented_image = self.detectron.segment_image(img)
         self.metadata_lmm = self.lmm.LMM_preprocessing(img, self.metadata_detectron)
         cache = self.detectron.cache
         self.detailed_items = {}
@@ -48,7 +50,7 @@ class Chat:
 
     def start_chat(self, query):
         self.llm.init_chat()
-        return self.continue_chat(query)
+        return self.continue_chat(query), self.segmented_image
     
     def continue_chat(self, query):
         premodel_context = self.lmm.process_query(query, self.metadata_detectron)
