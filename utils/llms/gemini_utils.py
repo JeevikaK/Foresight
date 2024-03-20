@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import os
-from base_llm import LLM
+from utils.llms.base_llm import LLM
 import google.generativeai as genai
 load_dotenv()
 
@@ -8,9 +8,10 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 class Gemini(LLM):
     def __init__(self, model = 'gemini-pro', history = []) -> None:
-        model = genai.GenerativeModel(model)
+        genai.configure(api_key=os.environ['GOOGLE_API_KEY'])
+        self.model = genai.GenerativeModel(model)
         self.chat = None
-        super(model, history)
+        super().__init__(self.model, history)
 
     def create_prompt(self, metadata_lmm, metadata_detectron, query, premodel_context):
         prompt = f'''You are a helpful AI assistant who takes input from the user which is the query. You answer the query with the help of the following additional information -

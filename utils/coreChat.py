@@ -17,8 +17,10 @@ class Chat:
     def prepareMetadata(self, img):
         self.detectron.initialise()
         self.metadata_detectron = self.detectron.create_metadata(img)
-        self.segmented_image = self.detectron.segment_image(img)
-        self.metadata_lmm = self.lmm.LMM_preprocessing(img, self.metadata_detectron)
+        self.segmented_image = self.detectron.segment_image()
+        print(self.metadata_detectron)
+        self.metadata_lmm = self.lmm.LMM_preprocessing(img_path=img, metadata_detectron=self.metadata_detectron)
+        print(self.metadata_lmm)
         cache = self.detectron.cache
         self.detailed_items = {}
         for item, pos in cache.items():
@@ -54,5 +56,9 @@ class Chat:
     
     def continue_chat(self, query):
         premodel_context = self.lmm.process_query(query, self.metadata_detectron)
-        response = self.llm.continue_chat(self, self.metadata_lmm, self.metadata_detectron, query, premodel_context)
+        print(premodel_context)
+        print()
+        response = self.llm.continue_chat(self.metadata_lmm, self.metadata_detectron, query, premodel_context)
+        print(response)
+        print()
         return self.format_response(response, query)

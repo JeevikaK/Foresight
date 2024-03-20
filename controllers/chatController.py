@@ -54,7 +54,7 @@ async def begin_conversation(prompt, image):
     chat.prepareMetadata(image)
     response, segmented_image = chat.start_chat(prompt)
     segmented_image = cv2.cvtColor(np.array(segmented_image), cv2.COLOR_RGB2BGR)
-    temp_file_path = Path("temp_image.jpg")
+    temp_file_path = "temp_image.jpg"
     cv2.imwrite(temp_file_path, segmented_image)
     return {
         "prompt": prompt,

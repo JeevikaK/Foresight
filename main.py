@@ -12,14 +12,14 @@ app = FastAPI(lifespan=ModelLifespan, debug=True)
 
 
 @app.get("/")
-async def read_root(): return {"Hello": "World", 'test': str(chatModel)}
+async def read_root(): return {"Hello": "World",}
 
 @app.post("/begin_conversation")
 async def begin_conversation(prompt: Annotated[str, Form()], image: Annotated[UploadFile, File()],
                         ): return await chatController.begin_conversation(prompt, image)
     
 @app.post("/converse")
-async def converse(prompt: Annotated[str, Form()],): return chatController.continue_chat
+async def converse(prompt: Annotated[str, Form()],): return chatController.continue_chat(prompt=prompt)
 
 @app.get("/get_convo_history")
 async def history(): return chatController.get_history()

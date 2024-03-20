@@ -161,7 +161,7 @@ class LLavaChat:
         refer to the following json also, which contains most of the objects in the scene along with the number of objects -
         {metadata_detectron}
         '''
-        return self.start_new_chat(img_path=img_path, prompt=prompt)
+        return self.start_new_chat(img=img_path, prompt=prompt)
     
     def process_query(self, query, metadata_detectron):
         prompt = f'''

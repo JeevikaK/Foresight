@@ -1,8 +1,8 @@
+import os, json, cv2, random, sys
+sys.path.insert(0, os.path.abspath('./detectron2'))
 import torch
-import os, json, cv2, random
 import detectron2
 import numpy as np
-import os, json, cv2, random
 from detectron2 import model_zoo
 from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
@@ -14,9 +14,9 @@ from detectron2.data import MetadataCatalog, DatasetCatalog
 class Detectron:
     def __init__(self, checkpoint_file):
         self.cfg = get_cfg()
-        self.merge_from_file(model_zoo.get_config_file(checkpoint_file))
-        self.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5 
-        self.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(checkpoint_file)
+        self.cfg.merge_from_file(model_zoo.get_config_file(checkpoint_file))
+        self.cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5 
+        self.cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(checkpoint_file)
         self.predictor = DefaultPredictor(self.cfg)
         self.initialise()
 
@@ -61,8 +61,8 @@ class Detectron:
                 metadata['count'] = metadata.get('count') + 1
         return self.metadata_detectron
     
-    def segment_image(self, image):
-        v = Visualizer(image, MetadataCatalog.get(self.cfg.DATASETS.TRAIN[0]), scale=1.0, instance_mode=ColorMode.SEGMENTATION)
-        outputs = self.predictor(image)
+    def segment_image(self):
+        v = Visualizer(self.image, MetadataCatalog.get(self.cfg.DATASETS.TRAIN[0]), scale=1.0, instance_mode=ColorMode.SEGMENTATION)
+        outputs = self.predictor(self.image)
         out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
         return out.get_image()
