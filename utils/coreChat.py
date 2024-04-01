@@ -2,6 +2,7 @@ from utils.llms.gemini_utils import Gemini
 from utils.llava_utils import LLavaChat
 from utils.detectron_utils import Detectron
 import string
+import copy
 
 class Chat:
     def __init__(self, geminiModel: Gemini, llavaModel: LLavaChat, detectronModel: Detectron):
@@ -40,6 +41,7 @@ class Chat:
     def format_response(self, response, query):
         formatted_response = map(lambda word: self.colorize(word), response.split())
         formatted_response = " ".join(formatted_response)
+        # formatted_response = "<p>" + formatted_response + "</p>"
         snippet = {
             'you' : query,
             'AI': formatted_response

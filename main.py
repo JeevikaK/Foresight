@@ -4,12 +4,13 @@ from typing import Union, Annotated
 from fastapi import File, Form, UploadFile
 from controllers import chatController
 from controllers.chatController import ModelLifespan
+from fastapi.staticfiles import StaticFiles
 
 
 app = FastAPI(lifespan=ModelLifespan, debug=True)
 
 # uvicorn main:app --reload --port 8000
-
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 async def read_root(): return {"Hello": "World",}

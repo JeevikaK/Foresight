@@ -2,3 +2,4 @@ __pycache__
 .env
 temp_image.jpg
 detectron2
+static

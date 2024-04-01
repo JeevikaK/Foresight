@@ -30,8 +30,6 @@ async def ModelLifespan(app: FastAPI):
                     bnb_4bit_quant_type='nf4',
                     device_map = 'auto',)
     print("ShareGPTV4 Loaded..")
-    whisperModel = Whisper("base")
-    print("Whisper Loaded...")
     detectronModel = Detectron("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
     print("Detectron Model Loaded")
     geminiModel = Gemini(model='gemini-pro')
@@ -54,12 +52,12 @@ async def begin_conversation(prompt, image):
     chat.prepareMetadata(image)
     response, segmented_image = chat.start_chat(prompt)
     segmented_image = cv2.cvtColor(np.array(segmented_image), cv2.COLOR_RGB2BGR)
-    temp_file_path = "temp_image.jpg"
+    segmented_image = cv2.rotate(segmented_image, cv2.ROTATE_90_CLOCKWISE)
+    temp_file_path = "./static/segemented_image.jpg"
     cv2.imwrite(temp_file_path, segmented_image)
     return {
         "prompt": prompt,
         "response" : response,
-        "segmented_image": FileResponse(temp_file_path, media_type="image/jpeg")
     }
 
 def continue_chat(prompt):
